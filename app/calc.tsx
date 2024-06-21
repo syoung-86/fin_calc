@@ -1,7 +1,7 @@
 import FutureValueChart from "@/components/futureValueChart";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { DataTable } from "@/components/futureValueTable";
 import { ColumnDef } from "@tanstack/react-table";
@@ -61,7 +61,6 @@ function calculateFutureValue(
         (1 + monthlyGrowthRate) ** monthsInFuture;
       totalFutureValue += futureValueOfContribution;
     }
-    console.log("currentAnnualContribution: ", currentAnnualContribution);
   }
 
   return { totalFutureValue, currentAnnualContribution };
@@ -71,7 +70,7 @@ const InvestmentCalculator: React.FC = () => {
   const [data, setData] = useState<
     { id: number; value: number; annualContribution: number }[]
   >([]);
-  const [initialInvestment, setInitialInvestment] = useState(1800000);
+  const [initialInvestment, setInitialInvestment] = useState(1000000);
   const [annualGrowthRate, setAnnualGrowthRate] = useState(0.12);
   const [monthlyContribution, setMonthlyContribution] = useState(0);
   const [annualContributionIncrease, setAnnualContributionIncrease] =
@@ -113,11 +112,22 @@ const InvestmentCalculator: React.FC = () => {
     setData(rows);
     setFutureValues(values);
   };
+const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  // This type is used to define the shape of our data.
-  // You can use a Zod schema here if you want.
   useEffect(() => {
-    handleCalculate();
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = setTimeout(() => {
+      handleCalculate();
+    }, 100);
+
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
   }, [
     initialInvestment,
     annualGrowthRate,
@@ -136,6 +146,7 @@ const InvestmentCalculator: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             gap: "20px",
+            minWidth: "300px",
           }}>
           <div>
             <label htmlFor="initial-investment">Initial Investment:</label>
