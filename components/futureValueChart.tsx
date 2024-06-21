@@ -61,7 +61,7 @@ const FutureValueChart: React.FC<FutureValueChartProps> = ({ data }) => {
       y: {
         title: {
           display: true,
-          text: "Value ($)",
+          text: "Value (R)",
         },
         beginAtZero: false,
       },
