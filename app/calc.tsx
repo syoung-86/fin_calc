@@ -2,10 +2,9 @@ import FutureValueChart from "@/components/futureValueChart";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import React, { useEffect, useRef, useState } from "react";
-import { Label } from "@/components/ui/label";
-import { DataTable } from "@/components/futureValueTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { SavedCalculationsTable } from "@/components/savedCalculationsTable";
+import { DataTable } from "@/components/futureValueTable";
 
 export type Row = {
   id: number;
@@ -28,28 +27,42 @@ function formatNumber(num: number): string {
 
 export const savedColumns: ColumnDef<SavedRow>[] = [
   {
-    accessorKey: "id",
-    header: "Year",
+    accessorKey: "total",
+    header: "Total",
+    cell: value => {
+      return (
+        <div className="min-w-[120px] p-2 text-right">
+          {value.getValue() as string}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "initialInvestment",
     header: "Initial Investment",
-  },
-  {
-    accessorKey: "annualGrowthRate",
-    header: "Annual Growth Rate",
+    cell: value => {
+      return (
+        <div className="min-w-[120px] p-2 text-right">
+          {value.getValue() as string}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "monthlyContribution",
     header: "Monthly Contribution",
   },
   {
+    accessorKey: "annualGrowthRate",
+    header: "Annual Growth Rate",
+  },
+  {
     accessorKey: "annualContributionIncrease",
     header: "Annual Contribution Increase",
   },
   {
-    accessorKey: "total",
-    header: "total",
+    accessorKey: "id",
+    header: "Year",
   },
 ];
 export const columns: ColumnDef<Row>[] = [
@@ -192,101 +205,87 @@ const InvestmentCalculator: React.FC = () => {
   ]);
   return (
     <>
-      <div style={{ display: "flex", gap: "20px" }}>
-        <div
-          style={{
-            marginLeft: "50px",
-            marginTop: "50px",
-            marginRight: "-500px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "20px",
-            minWidth: "300px",
-          }}>
-          <div>
-            <label htmlFor="initial-investment">Initial Investment:</label>
-            <Slider
-              id="initial-investment"
-              defaultValue={[initialInvestment]}
-              max={5000000}
-              step={100000}
-              onValueChange={value => setInitialInvestment(value[0])}
-            />
-            <span>{`R ${formatNumber(initialInvestment)}`}</span>
+      <div className="container mx-auto p-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="col-span-1 md:col-span-1 p-4">
+            <div className="flex flex-col gap-4">
+              <div>
+                <label htmlFor="initial-investment">Initial Investment:</label>
+                <Slider
+                  id="initial-investment"
+                  defaultValue={[initialInvestment]}
+                  max={5000000}
+                  step={100000}
+                  onValueChange={value => setInitialInvestment(value[0])}
+                />
+                <span>{`R ${formatNumber(initialInvestment)}`}</span>
+              </div>
+              <div>
+                <label htmlFor="annualGrowthRate">Annual Growth Rate:</label>
+                <Slider
+                  id="annualGrowthRate"
+                  defaultValue={[annualGrowthRate]}
+                  max={0.3}
+                  step={0.01}
+                  onValueChange={value => setAnnualGrowthRate(value[0])}
+                />
+                <span>{`${(annualGrowthRate * 100).toFixed(2)}%`}</span>
+              </div>
+              <div>
+                <label htmlFor="monthlyContribution">
+                  Monthly Contribution:
+                </label>
+                <Slider
+                  id="monthlyContribution"
+                  defaultValue={[monthlyContribution]}
+                  max={100000}
+                  step={1000}
+                  onValueChange={value => setMonthlyContribution(value[0])}
+                />
+                <span>{`R ${formatNumber(monthlyContribution)}`}</span>
+              </div>
+              <div>
+                <label htmlFor="annualContributionIncrease">
+                  Annual Contribution Increase:
+                </label>
+                <Slider
+                  id="annualContributionIncrease"
+                  defaultValue={[annualContributionIncrease]}
+                  max={0.3}
+                  step={0.01}
+                  onValueChange={value =>
+                    setAnnualContributionIncrease(value[0])
+                  }
+                />
+                <span>{`${(annualContributionIncrease * 100).toFixed(2)}%`}</span>
+              </div>
+              <div>
+                <label htmlFor="years">Years:</label>
+                <Slider
+                  id="years"
+                  defaultValue={[period]}
+                  max={50}
+                  step={1}
+                  onValueChange={value => setPeriod(value[0])}
+                />
+                <span>{`${period} years`}</span>
+              </div>
+              <Button onClick={save}>Save</Button>
+            </div>
           </div>
-          <div>
-            <label htmlFor="annualGrowthRate">Annual Growth Rate:</label>
-            <Slider
-              id="annualGrowthRate"
-              defaultValue={[annualGrowthRate]}
-              max={0.3}
-              step={0.01}
-              onValueChange={value => setAnnualGrowthRate(value[0])}
-            />
-            <span>{`${(annualGrowthRate * 100).toFixed(2)}%`}</span>
-          </div>
-          <div>
-            <label htmlFor="monthlyContribution">Monthly Contribution:</label>
-            <Slider
-              id="monthlyContribution"
-              defaultValue={[monthlyContribution]}
-              max={100000}
-              step={1000}
-              onValueChange={value => setMonthlyContribution(value[0])}
-            />
-            <span>{`R ${formatNumber(monthlyContribution)}`}</span>
-          </div>
-          <div>
-            <label htmlFor="annualContributionIncrease">
-              Annual Contribution Increase:
-            </label>
-            <Slider
-              id="annualContributionIncrease"
-              defaultValue={[annualContributionIncrease]}
-              max={0.3}
-              step={0.01}
-              onValueChange={value => setAnnualContributionIncrease(value[0])}
-            />
-            <span>{`${(annualContributionIncrease * 100).toFixed(2)}%`}</span>
-          </div>
-          <div>
-            <label htmlFor="years">Years:</label>
-            <Slider
-              id="years"
-              defaultValue={[period]}
-              max={50}
-              step={1}
-              onValueChange={value => setPeriod(value[0])}
-            />
-            <span>{`${period} years`}</span>
-          </div>
-          <div>
-            <Button onClick={save}> Save</Button>
+          <div className="col-span-1 md:col-span-2 p-4">
+            <FutureValueChart data={futureValues} />
           </div>
         </div>
-        <FutureValueChart data={futureValues} />
-      </div>
-
-      <div
-        style={{
-          minHeight: "100px",
-          width: "80%",
-          marginLeft: "50px",
-          marginTop: "50px",
-        }}>
-        <SavedCalculationsTable columns={savedColumns} data={savedInputs} />
-      </div>
-      <div
-        style={{
-          minHeight: "100px",
-          width: "80%",
-          marginLeft: "50px",
-          marginTop: "50px",
-        }}>
-        <SavedCalculationsTable
-          columns={columns}
-          data={data.sort((a, b) => b.id - a.id)}
-        />
+        <div className="col-span-1 md:col-span-2 p-4">
+          <SavedCalculationsTable columns={savedColumns} data={savedInputs} />
+        </div>
+        <div className="mt-8">
+          <DataTable
+            columns={columns}
+            data={data.sort((a, b) => b.id - a.id)}
+          />
+        </div>
       </div>
     </>
   );

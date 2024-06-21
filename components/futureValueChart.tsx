@@ -70,15 +70,7 @@ const FutureValueChart: React.FC<FutureValueChartProps> = ({ data }) => {
 
   return (
     <>
-      <div
-        style={{
-          minHeight: "500px",
-          width: "100%",
-          maxWidth: "1000px",
-          margin: "0 auto",
-        }}>
-        <Line data={chartData} options={options} />
-      </div>
+      <Line data={chartData} options={options} />
     </>
   );
 };
