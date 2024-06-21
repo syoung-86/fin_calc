@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { DataTable } from "@/components/futureValueTable";
 import { ColumnDef } from "@tanstack/react-table";
+import { SavedCalculationsTable } from "@/components/savedCalculationsTable";
 
 export type Row = {
   id: number;
@@ -12,9 +13,45 @@ export type Row = {
   annualContribution: number;
 };
 
+export type SavedRow = {
+  id: string;
+  initialInvestment: string;
+  annualGrowthRate: string;
+  monthlyContribution: string;
+  annualContributionIncrease: string;
+  total: string;
+};
+
 function formatNumber(num: number): string {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
+
+export const savedColumns: ColumnDef<SavedRow>[] = [
+  {
+    accessorKey: "id",
+    header: "Year",
+  },
+  {
+    accessorKey: "initialInvestment",
+    header: "Initial Investment",
+  },
+  {
+    accessorKey: "annualGrowthRate",
+    header: "Annual Growth Rate",
+  },
+  {
+    accessorKey: "monthlyContribution",
+    header: "Monthly Contribution",
+  },
+  {
+    accessorKey: "annualContributionIncrease",
+    header: "Annual Contribution Increase",
+  },
+  {
+    accessorKey: "total",
+    header: "total",
+  },
+];
 export const columns: ColumnDef<Row>[] = [
   {
     accessorKey: "id",
@@ -65,7 +102,6 @@ function calculateFutureValue(
 
   return { totalFutureValue, currentAnnualContribution };
 }
-
 const InvestmentCalculator: React.FC = () => {
   const [data, setData] = useState<
     { id: number; value: number; annualContribution: number }[]
@@ -79,6 +115,7 @@ const InvestmentCalculator: React.FC = () => {
   const [futureValues, setFutureValues] = useState<
     { year: number; value: number; monthlyContribution: number }[]
   >([]);
+  const [savedInputs, setSavedInputs] = useState<SavedRow[]>([]);
 
   const handleCalculate = () => {
     const values: {
@@ -112,8 +149,26 @@ const InvestmentCalculator: React.FC = () => {
     setData(rows);
     setFutureValues(values);
   };
-const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
+  const save = () => {
+    const newSavedInputs = [...savedInputs];
+    const total = Math.round(data[0].value);
+    const newRow: SavedRow = {
+      id: `${period} years`,
+      initialInvestment: `R ${formatNumber(initialInvestment)}`,
+      monthlyContribution: `R ${formatNumber(monthlyContribution)}`,
+      annualGrowthRate: `${annualGrowthRate * 100} %`,
+      annualContributionIncrease: `${annualContributionIncrease * 100} %`,
+      total: `R ${formatNumber(total)}`,
+    };
+    newSavedInputs.push(newRow);
+    setSavedInputs(newSavedInputs);
+  };
+
+  useEffect(() => {
+    console.log("savedInputs: ", savedInputs);
+  }, [savedInputs]);
   useEffect(() => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
@@ -205,18 +260,33 @@ const debounceRef = useRef<NodeJS.Timeout | null>(null);
             />
             <span>{`${period} years`}</span>
           </div>
+          <div>
+            <Button onClick={save}> Save</Button>
+          </div>
         </div>
         <FutureValueChart data={futureValues} />
       </div>
 
       <div
         style={{
-          minHeight: "500px",
+          minHeight: "100px",
           width: "80%",
           marginLeft: "50px",
           marginTop: "50px",
         }}>
-        <DataTable columns={columns} data={data.sort((a, b) => b.id - a.id)} />
+        <SavedCalculationsTable columns={savedColumns} data={savedInputs} />
+      </div>
+      <div
+        style={{
+          minHeight: "100px",
+          width: "80%",
+          marginLeft: "50px",
+          marginTop: "50px",
+        }}>
+        <SavedCalculationsTable
+          columns={columns}
+          data={data.sort((a, b) => b.id - a.id)}
+        />
       </div>
     </>
   );
