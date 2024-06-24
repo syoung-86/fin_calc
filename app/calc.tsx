@@ -120,10 +120,10 @@ const InvestmentCalculator: React.FC = () => {
     { id: number; value: number; annualContribution: number }[]
   >([]);
   const [initialInvestment, setInitialInvestment] = useState(100000);
-  const [annualGrowthRate, setAnnualGrowthRate] = useState(0.9);
+  const [annualGrowthRate, setAnnualGrowthRate] = useState(0.09);
   const [monthlyContribution, setMonthlyContribution] = useState(0);
   const [annualContributionIncrease, setAnnualContributionIncrease] =
-    useState(0);
+    useState(0.1);
   const [period, setPeriod] = useState(10);
   const [futureValues, setFutureValues] = useState<
     { year: number; value: number; monthlyContribution: number }[]
@@ -164,6 +164,14 @@ const InvestmentCalculator: React.FC = () => {
   };
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
+  const reset = () => {
+    setInitialInvestment(100000);
+    setAnnualGrowthRate(0.09);
+    setMonthlyContribution(0);
+    setAnnualContributionIncrease(0.1);
+    setPeriod(10);
+    setSavedInputs([]);
+  };
   const save = () => {
     const newSavedInputs = [...savedInputs];
     const total = Math.round(data[0].value);
@@ -213,7 +221,7 @@ const InvestmentCalculator: React.FC = () => {
                 <label htmlFor="initial-investment">Initial Investment:</label>
                 <Slider
                   id="initial-investment"
-                  defaultValue={[initialInvestment]}
+                  value={[initialInvestment]}
                   max={5000000}
                   step={100000}
                   onValueChange={value => setInitialInvestment(value[0])}
@@ -224,7 +232,7 @@ const InvestmentCalculator: React.FC = () => {
                 <label htmlFor="annualGrowthRate">Annual Growth Rate:</label>
                 <Slider
                   id="annualGrowthRate"
-                  defaultValue={[annualGrowthRate]}
+                  value={[annualGrowthRate]}
                   max={0.3}
                   step={0.01}
                   onValueChange={value => setAnnualGrowthRate(value[0])}
@@ -237,7 +245,7 @@ const InvestmentCalculator: React.FC = () => {
                 </label>
                 <Slider
                   id="monthlyContribution"
-                  defaultValue={[monthlyContribution]}
+                  value={[monthlyContribution]}
                   max={100000}
                   step={1000}
                   onValueChange={value => setMonthlyContribution(value[0])}
@@ -250,7 +258,7 @@ const InvestmentCalculator: React.FC = () => {
                 </label>
                 <Slider
                   id="annualContributionIncrease"
-                  defaultValue={[annualContributionIncrease]}
+                  value={[annualContributionIncrease]}
                   max={0.3}
                   step={0.01}
                   onValueChange={value =>
@@ -263,7 +271,7 @@ const InvestmentCalculator: React.FC = () => {
                 <label htmlFor="years">Years:</label>
                 <Slider
                   id="years"
-                  defaultValue={[period]}
+                  value={[period]}
                   max={50}
                   step={1}
                   onValueChange={value => setPeriod(value[0])}
@@ -271,6 +279,7 @@ const InvestmentCalculator: React.FC = () => {
                 <span>{`${period} years`}</span>
               </div>
               <Button onClick={save}>Save</Button>
+              <Button onClick={reset}>Reset</Button>
             </div>
           </div>
           <div className="col-span-1 md:col-span-2 p-4">
