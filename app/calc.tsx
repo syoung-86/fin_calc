@@ -119,12 +119,12 @@ const InvestmentCalculator: React.FC = () => {
   const [data, setData] = useState<
     { id: number; value: number; annualContribution: number }[]
   >([]);
-  const [initialInvestment, setInitialInvestment] = useState(1000000);
-  const [annualGrowthRate, setAnnualGrowthRate] = useState(0.12);
+  const [initialInvestment, setInitialInvestment] = useState(100000);
+  const [annualGrowthRate, setAnnualGrowthRate] = useState(0.9);
   const [monthlyContribution, setMonthlyContribution] = useState(0);
   const [annualContributionIncrease, setAnnualContributionIncrease] =
-    useState(0.06);
-  const [period, setPeriod] = useState(30);
+    useState(0);
+  const [period, setPeriod] = useState(10);
   const [futureValues, setFutureValues] = useState<
     { year: number; value: number; monthlyContribution: number }[]
   >([]);
